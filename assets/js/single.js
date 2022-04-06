@@ -1,3 +1,4 @@
+var limitWarningEl = document.querySelector("#limit-warning");
 var issueContainerEl = document.querySelector("#issues-container");
 
 var getRepoIssues = function(repo) {
@@ -7,6 +8,11 @@ var getRepoIssues = function(repo) {
         if (response.ok) {
           response.json().then(function(data) {
             displayIssues(data);
+
+            //check if api has paginated issues
+            if(response.headers.get("link")) {
+                displayWarning(repo);
+            }
           });
         }
         else {
@@ -53,4 +59,18 @@ var getRepoIssues = function(repo) {
     };
 };
 
-getRepoIssues("rwillford/portfolio");
+var displayWarning = function(repo) {
+    //add text to warning container
+    limitWarningEl.textContent = "To See More Than 30 Issues, visit ";
+
+    //create link element
+    var linkEl = document.createElement("a");
+    linkEl.textContent = "See More Issues on GitHub.com";
+    linkEl.setAttribute("href", "http://github.com/" + repo + "/issues");
+    linkEl.setAttribute("target", "_blank");
+
+    //append to warning container
+    limitWarningEl.appendChild(linkEl);
+};
+
+getRepoIssues("facebook/react");
